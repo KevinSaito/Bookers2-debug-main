@@ -1,9 +1,10 @@
 class BooksController < ApplicationController
-  
+  before_action :authenticate_user!
+  before_action :baria_user, only: [:edit, :destroy, :update]
   def show
-    @book = Book.find(params[:id])
-    @user = @book.user
-    @newbook = Book.new
+    @findbook = Book.find(params[:id])
+    @user = @findbook.user
+    @book = Book.new
   end
 
   def index
@@ -19,7 +20,7 @@ class BooksController < ApplicationController
     else
       @books = Book.all
       @user = current_user
-      render 'index'
+      render :index
     end
   end
 
@@ -32,13 +33,13 @@ class BooksController < ApplicationController
     if @book.update(book_params)
       redirect_to book_path(@book), notice: "You have updated book successfully."
     else
-      render "edit"
+      render :edit
     end
   end
 
-  def delete
+  def destroy
     @book = Book.find(params[:id])
-    @book.destoy
+    @book.destroy
     redirect_to books_path
   end
 
@@ -46,5 +47,10 @@ class BooksController < ApplicationController
 
   def book_params
     params.require(:book).permit(:title, :body)
+  end
+  def baria_user
+    unless Book.find(params[:id]).user == current_user
+        redirect_to books_path
+    end
   end
 end
