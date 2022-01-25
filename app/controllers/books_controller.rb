@@ -2,9 +2,9 @@ class BooksController < ApplicationController
   before_action :authenticate_user!
   before_action :baria_user, only: [:edit, :destroy, :update]
   def show
-    @book = Book.find(params[:id])
-    @user = @book.user
-    @newbook = Book.new
+    @findbook = Book.find(params[:id])
+    @user = @findbook.user
+    @book = Book.new
   end
 
   def index
