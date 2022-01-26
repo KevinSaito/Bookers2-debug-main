@@ -1,10 +1,9 @@
 class BooksController < ApplicationController
   before_action :authenticate_user!
-  before_action :baria_user, only: [:edit, :destroy, :update]
+  before_action :ensure_correct_user, only: [:edit, :update, :destroy]
   def show
-    @findbook = Book.find(params[:id])
-    @user = @findbook.user
-    @book = Book.new
+    @book = Book.find(params[:id])
+    @book_new = Book.new
   end
 
   def index
@@ -43,8 +42,8 @@ class BooksController < ApplicationController
   end
 
   def destroy
-    @findbook = Book.find(params[:id])
-    @findbook.destroy
+    @book = Book.find(params[:id])
+    @book.destroy
     redirect_to books_path, notice: "Book was successfully destroyed."
   end
 
@@ -53,9 +52,10 @@ class BooksController < ApplicationController
   def book_params
     params.require(:book).permit(:title, :body)
   end
-  def baria_user
-    unless Book.find(params[:id]).user == current_user
-        redirect_to books_path
+  def ensure_correct_user
+    @book = Book.find(params[:id])
+    unless @book.user == current_user
+      redirect_to books_path
     end
   end
 end
