@@ -10,12 +10,25 @@ class User < ApplicationRecord
   has_many :_comments, dependent: :destroy
   has_many :follower, class_name: "Relationship", foreign_key: "follower_id", dependent: :destroy
   has_many :followed, class_name: "Relationship", foreign_key: "followed_id", dependent: :destroy
+  has_many :following_user, through: :follower, source: :followed
+  has_many :follower_user, through: :followed, source: :follower
 
   validates :name, length: { minimum: 2, maximum: 20 }, uniqueness: true
   validates :introduction, length:{maximum:50}
 
 
-
+  def follow(user_id)
+    follower_create(followed_id: user_id)
+  end
+  
+  def unfollow(user_id)
+    follower.find_by(followed_id: user_id).destroy
+  end
+  
+  def following?(user)
+    following_user.include?(user)
+  end
+  
   def get_profile_image
     (profile_image.attached?) ? profile_image : 'no_image.jpg'
   end
